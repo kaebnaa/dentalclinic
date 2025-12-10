@@ -1,0 +1,38 @@
+{
+  "name": "dental-clinic-backend",
+  "version": "1.0.0",
+  "description": "REST API for Dental Clinic Appointment & Patient Management System",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "seed": "node database/seed.js",
+    "test": "node test-api.js",
+    "reset-passwords": "node database/reset-passwords.js",
+    "vercel-build": "echo 'Build complete'"
+  },
+  "keywords": [
+    "dental",
+    "clinic",
+    "api",
+    "express",
+    "supabase"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
