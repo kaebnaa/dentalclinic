@@ -1,4 +1,4 @@
-import { supabase, supabaseAdmin } from '../config/supabase.js';
+import { supabase } from '../config/supabase.js';
 import { AuditService } from '../services/auditService.js';
 
 /**
@@ -54,8 +54,7 @@ export const createBranch = async (req, res, next) => {
   try {
     const { name, address, latitude, longitude } = req.body;
 
-    // Use supabaseAdmin to bypass RLS for admin operations
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('branches')
       .insert({
         name,
@@ -90,8 +89,8 @@ export const updateBranch = async (req, res, next) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Get current branch (use supabaseAdmin to bypass RLS)
-    const { data: current, error: fetchError } = await supabaseAdmin
+    // Get current branch
+    const { data: current, error: fetchError } = await supabase
       .from('branches')
       .select('*')
       .eq('id', id)
@@ -103,8 +102,8 @@ export const updateBranch = async (req, res, next) => {
       });
     }
 
-    // Update branch (use supabaseAdmin to bypass RLS)
-    const { data, error } = await supabaseAdmin
+    // Update branch
+    const { data, error } = await supabase
       .from('branches')
       .update(updates)
       .eq('id', id)
@@ -134,8 +133,8 @@ export const deleteBranch = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    // Get current branch (use supabaseAdmin to bypass RLS)
-    const { data: current, error: fetchError } = await supabaseAdmin
+    // Get current branch
+    const { data: current, error: fetchError } = await supabase
       .from('branches')
       .select('*')
       .eq('id', id)
@@ -147,8 +146,8 @@ export const deleteBranch = async (req, res, next) => {
       });
     }
 
-    // Delete branch (use supabaseAdmin to bypass RLS)
-    const { error } = await supabaseAdmin
+    // Delete branch
+    const { error } = await supabase
       .from('branches')
       .delete()
       .eq('id', id);

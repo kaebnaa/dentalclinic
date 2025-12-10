@@ -103,22 +103,6 @@ class ApiClient {
     });
   }
 
-  async updateProfile(data: {
-    name?: string;
-    phone?: string;
-    dateOfBirth?: string;
-    address?: string;
-    gender?: string;
-    emergencyContactName?: string;
-    emergencyContactPhone?: string;
-    emergencyContactRelation?: string;
-  }): Promise<ApiResponse> {
-    return this.request('/api/auth/profile', {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    });
-  }
-
   // Branches
   async getBranches() {
     return this.request('/api/branches');
