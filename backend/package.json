@@ -9,7 +9,11 @@
     "start": "node src/server.js",
     "seed": "node database/seed.js",
     "test": "node test-api.js",
+    "test:comprehensive": "node test-comprehensive.js",
+    "test:database": "node test-database.js",
+    "test:all": "node test-api.js && node test-comprehensive.js && node test-database.js",
     "reset-passwords": "node database/reset-passwords.js",
+    "verify-users": "node database/verify-users.js",
     "vercel-build": "echo 'Build complete'"
   },
   "keywords": [

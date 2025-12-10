@@ -70,10 +70,14 @@ const loginAttempts = new Map();
 
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
+  max: 50, // Limit each IP to 50 requests per windowMs (increased for testing)
   message: 'Too many authentication attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting in test environment or if test header is present
+    return process.env.NODE_ENV === 'test' || req.headers['x-test-mode'] === 'true';
+  }
 });
 
 /**

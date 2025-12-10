@@ -21,13 +21,19 @@ export class AppointmentService {
     // Calculate end time (assume 1 hour appointments)
     const endTime = `${String(hours + 1).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 
+    // Convert times to minutes for easier comparison
+    const startMinutes = hours * 60 + minutes;
+    const endMinutes = (hours + 1) * 60 + minutes;
+
     // Check for existing appointments (exclude cancelled/completed)
-    const { data: existing, error } = await supabase
+    // IMPORTANT: Filter by both doctor_id AND branch_id to prevent false positives
+    const { data: existing, error } = await supabaseAdmin
       .from('appointments')
-      .select('id, start_time, end_time')
+      .select('id, start_time, end_time, status')
       .eq('doctor_id', doctorId)
+      .eq('branch_id', branchId) // Add branch_id filter
       .eq('date', date)
-      .in('status', ['booked', 'confirmed']);
+      .in('status', ['booked', 'confirmed']); // Only check active appointments
 
     if (error) {
       throw new Error(`Database error: ${error.message}`);
@@ -36,11 +42,23 @@ export class AppointmentService {
     // Check for time overlap
     if (existing && existing.length > 0) {
       const hasOverlap = existing.some(apt => {
-        const aptStart = apt.start_time;
-        const aptEnd = apt.end_time;
-        return (startTime >= aptStart && startTime < aptEnd) ||
-               (endTime > aptStart && endTime <= aptEnd) ||
-               (startTime <= aptStart && endTime >= aptEnd);
+        // Parse existing appointment times
+        const [aptStartHours, aptStartMinutes] = apt.start_time.split(':').map(Number);
+        const [aptEndHours, aptEndMinutes] = apt.end_time.split(':').map(Number);
+        const aptStartMinutesTotal = aptStartHours * 60 + aptStartMinutes;
+        const aptEndMinutesTotal = aptEndHours * 60 + aptEndMinutes;
+
+        // Check for overlap: new appointment overlaps if:
+        // - New start is between existing start and end, OR
+        // - New end is between existing start and end, OR
+        // - New appointment completely contains existing appointment, OR
+        // - Existing appointment completely contains new appointment
+        const overlaps = (startMinutes >= aptStartMinutesTotal && startMinutes < aptEndMinutesTotal) ||
+                        (endMinutes > aptStartMinutesTotal && endMinutes <= aptEndMinutesTotal) ||
+                        (startMinutes <= aptStartMinutesTotal && endMinutes >= aptEndMinutesTotal) ||
+                        (startMinutes >= aptStartMinutesTotal && endMinutes <= aptEndMinutesTotal);
+
+        return overlaps;
       });
 
       if (hasOverlap) {
