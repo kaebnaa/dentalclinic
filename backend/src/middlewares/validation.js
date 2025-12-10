@@ -52,6 +52,19 @@ export const schemas = {
     })
   }),
 
+  updateProfile: z.object({
+    body: z.object({
+      name: z.string().min(2).max(100).optional(),
+      phone: z.string().regex(/^\+?[1-9]\d{1,14}$/).optional(),
+      dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      address: z.string().min(5).max(200).optional(),
+      gender: z.enum(['male', 'female', 'other', 'prefer not to say']).optional(),
+      emergencyContactName: z.string().min(2).max(100).optional(),
+      emergencyContactPhone: z.string().regex(/^\+?[1-9]\d{1,14}$/).optional(),
+      emergencyContactRelation: z.string().min(2).max(50).optional(),
+    })
+  }),
+
   createBranch: z.object({
     body: z.object({
       name: z.string().min(2).max(100),

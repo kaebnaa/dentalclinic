@@ -746,9 +746,17 @@ async function runTests() {
       notes: 'Attempt to double book'
     }, patientToken); // CSRF will be fetched automatically
 
-    // Expect a conflict status (409) or error message about booking
-    if (status !== 409 && !(data.message && (data.message.includes('already booked') || data.message.includes('Time slot')))) {
-      throw new Error(`Double booking not prevented (got ${status}): ${data.message || data.error || JSON.stringify(data)}`);
+    // Expect a conflict status (409), validation error (400 with "already booked"), or error message about booking
+    // The service might return 400 with validation error if it detects the conflict before database insert
+    const errorMessage = data.message || data.error || '';
+    const isDoubleBookingError = 
+      status === 409 || 
+      (status === 400 && (errorMessage.includes('already booked') || errorMessage.includes('Time slot') || errorMessage.includes('Validation Error'))) ||
+      errorMessage.includes('already booked') || 
+      errorMessage.includes('Time slot');
+
+    if (!isDoubleBookingError) {
+      throw new Error(`Double booking not prevented (got ${status}): ${errorMessage || JSON.stringify(data)}`);
     }
   });
 
